@@ -10,7 +10,7 @@ router.delete("/:id",deleteFile)
 
 //generate signed urls
 router.post("/signed-url/upload",getUploadSignedUrl)
-router.get("/signed-url/view",getViewSignedUrl)
+router.get("/signed-url/view/:id",getViewSignedUrl)
 router.get("/signed-url/download",getDownloadSignedUrl)
 
 
