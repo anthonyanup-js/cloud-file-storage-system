@@ -43,42 +43,29 @@ export const uploadFile = async (req, res) => {
 
 export const renameFile = async (req, res) => {
   const createdBy = req.userId || 1;
-  let { id: parentFolder } = req.params;
-  if (parentFolder === "root") {
-    parentFolder = null;
-  }
-  const { newFileName, fileId } = req.body;
-  if (!createdBy || !fileId || !newFileName) {
+  let { id } = req.params;
+
+  const { newFileName } = req.body;
+  if (!createdBy || !id || !newFileName) {
     throw new customError("All fields are required", 400);
     return;
   }
-  const updatedFile = await File.findOneAndUpdate(
-    {
-      _id: fileId,
-      createdBy,
-      parentFolder,
-    },
-    {
-      $set: {
-        fileName: newFileName,
-      },
-    },
-    {
-      new: true,
-      runValidators: true,
-    },
+  const updatedFile = await File.updateOne(
+    { _id: id, createdBy },
+    { $set: { fileName: newFileName } },
+    { new: true, runValidators: true },
   );
 
   if (!updatedFile) {
     throw new customError("File Not Found", 400);
     return;
   }
-  res.status(200).json({ updatedFile });
+  res.status(200).json({ message:"File renamed successfully" });
 };
 
 export const deleteFile = async (req, res) => {
   //delete file in s3 after that in db
-  const createdBy = req.userId;
+  const createdBy = req.userId || 1;
   const { id } = req.params;
   await File.deleteOne({ _id: id, createdBy });
   res.status(200).json({ message: "File deleted successfully" });
