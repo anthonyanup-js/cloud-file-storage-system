@@ -1,7 +1,6 @@
 import Folder from "../models/folder.model.js";
 import File from "../models/file.model.js";
 import customError from "../utils/customError.js";
-import asyncHandler from "../utils/asyncHandler.js";
 
 export const createFolder = async (req, res) => {
   const { folderName } = req.body;
