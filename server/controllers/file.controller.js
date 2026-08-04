@@ -1,7 +1,7 @@
 import File from "../models/file.model.js";
 import customError from "../utils/customError.js";
 import crypto from "crypto";
-import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, GetObjectCommand,DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3Client } from "../config/s3.config.js";
 
@@ -67,7 +67,18 @@ export const deleteFile = async (req, res) => {
   //delete file in s3 after that in db
   const createdBy = req.userId || 1;
   const { id } = req.params;
-  await File.deleteOne({ _id: id, createdBy });
+  const file=await File.findById(id);
+  if(!file){
+    throw new customError("File not found",400)
+    return
+  }
+  const command=new DeleteObjectCommand({
+    Bucket:process.env.AWS_BUCKET_NAME,
+    Key:file.s3Key
+  })
+
+  await s3Client.send(command)
+  await file.deleteOne()
   res.status(200).json({ message: "File deleted successfully" });
 };
 
