@@ -56,18 +56,23 @@ export const deleteFolder = async (req, res) => {
 
   //use itterative approach
   const stack = [rootFolder._id];
+  const folderIds=[]
   while (stack.length) {
     const folderId = stack.pop();
-    //delete the files from s3 before deleteing it from DB
-    //also delete files from s3 (implement it later)
-    const [folders] = await Promise.all([
-      Folder.find({ parentFolder: folderId, createdBy }),
-      File.deleteMany({ parentFolder: folderId, createdBy }),
-      Folder.deleteOne({ _id: folderId, createdBy }),
-    ]);
-    folders.forEach((folder) => stack.push(folder._id));
+    folderIds.push(folderId)
+    const ids=await Folder.find({ parentFolder: folderId, createdBy },{_id:1})
+    ids.forEach((folder) => {
+      stack.push(folder._id)
+      folderIds.push(folder._id)
+      
+    
+    });
   }
-  //also delete files from s3 (implement it later)
+  await Promise.all([Folder.deleteMany({_id:{$in:folderIds}}),
+  File.deleteMany({parentFolder:{$in:folderIds}})])
+
+
+
   res.status(200).json({ message: "folder deleted successfullt" });
 };
 
