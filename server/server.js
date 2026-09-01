@@ -7,7 +7,6 @@ import authRouter from "./routes/auth.Route.js"
 import fileRouter from "./routes/file.Route.js"
 import folderRouter from "./routes/folder.Route.js"
 import errorMiddleware from "./middlewares/error.middleware.js"
-
 const app=express()
 
 app.use(cors({

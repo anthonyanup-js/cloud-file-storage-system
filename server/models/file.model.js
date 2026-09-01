@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
 
 const fileSchema = new mongoose.Schema({
-    createdBy:{
+    owner:{
       type:Number,
       ref:"User",
       default:1,
-      select: false
 
     },
   fileName: {
